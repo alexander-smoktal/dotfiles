@@ -1,0 +1,90 @@
+(setq rust-package-list
+      '(ace-jump-zap
+	ace-jump-mode
+	ample-theme
+	autopair
+	cargo
+	company
+	flycheck-rust
+	helm
+	racer
+	rust-mode))
+
+(package-initialize)
+
+(add-to-list 'package-archives
+             '("melpa-stable" . "https://melpa.org/packages/") t)
+
+;; install missing packages
+(dolist (package rust-package-list)
+  (unless (package-installed-p package)
+    (unless package-archive-contents
+      (package-refresh-contents))
+    (package-install package)))
+
+(custom-set-variables
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(ansi-color-faces-vector
+   [default default default italic underline success warning error])
+ '(ansi-color-names-vector
+   ["#504545" "#ad8572" "#a9df90" "#aaca86" "#91a0b3" "#ab85a3" "#afcfef" "#bdbdb3"])
+ '(custom-safe-themes
+   (quote
+    ("bf798e9e8ff00d4bf2512597f36e5a135ce48e477ce88a0764cfb5d8104e8163" "c9ddf33b383e74dac7690255dd2c3dfa1961a8e8a1d20e401c6572febef61045" "47ec21abaa6642fefec1b7ace282221574c2dd7ef7715c099af5629926eb4fd7" "36ca8f60565af20ef4f30783aa16a26d96c02df7b4e54e9900a5138fb33808da" default)))
+ '(frame-brackground-mode (quote dark))
+ '(package-selected-packages
+   (quote
+    (company racer flycheck-rust ample-theme rust-mode))))
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ )
+
+(load-theme 'ample t t)
+(enable-theme 'ample)
+(global-linum-mode)
+(global-company-mode)
+(show-paren-mode 1)
+(autopair-global-mode)
+
+(with-eval-after-load 'rust-mode
+  (add-hook 'flycheck-mode-hook #'flycheck-rust-setup))
+
+(add-hook 'rust-mode-hook #'cargo-minor-mode)
+(add-hook 'rust-mode-hook #'racer-mode)
+(add-hook 'racer-mode-hook #'eldoc-mode)
+(add-hook 'racer-mode-hook #'flycheck-mode)
+
+;;(define-key rust-mode-map (kbd "TAB") #'company-indent-or-complete-common)
+(setq company-tooltip-align-annotations t)
+(global-set-key (kbd "<C-tab>") #'other-window)
+(global-set-key (kbd "C-x C-b") #'helm-buffers-list)
+(global-set-key (kbd "C-`") #'delete-other-windows)
+(global-set-key (kbd "C-z") 'ace-jump-mode)
+(global-set-key (kbd "M-z") 'ace-jump-zap-to-char)
+(global-set-key (kbd "C-c /") 'uncomment-region)
+(global-set-key (kbd "C-c C-/") 'comment-region)
+
+(defun duplicate-line()
+  (interactive)
+  (move-beginning-of-line 1)
+  (kill-line)
+  (yank)
+  (open-line 1)
+  (next-line 1)
+  (yank))
+
+(global-set-key (kbd "C-d") 'duplicate-line)
+
+(defun insert-line()
+  (interactive)
+  (open-line 1)
+  (next-line 1))
+
+(global-set-key (kbd "<C-return>") 'insert-line)
+
